@@ -1,56 +1,39 @@
-# Import Dataset from sklearn
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import r2_score,mean_absolute_error,mean_squared_error
 from sklearn.datasets import load_iris
-# Load Iris Data
-iris = load_iris()
-# Creating pd DataFrames
-iris_df = pd.DataFrame(data= iris.data, columns= iris.feature_names)
-target_df = pd.DataFrame(data= iris.target, columns= ['species'])
-def converter(specie):
-    if specie == 0:
-        return 'setosa'
-    elif specie == 1:
-        return 'versicolor'
-    else:
-        return 'virginica'
-target_df['species'] = target_df['species'].apply(converter)
-# Concatenate the DataFrames
-iris_df = pd.concat([iris_df, target_df], axis= 1)
-iris_df.describe()
-iris_df.info()
-sns.pairplot(iris_df, hue= 'species')
-# Converting Objects to Numerical dtype
-iris_df.drop('species', axis= 1, inplace= True)
-target_df = pd.DataFrame(columns= ['species'], data= iris.target)
-iris_df = pd.concat([iris_df, target_df], axis= 1)
-# Variables
-X= iris_df.drop(labels= 'sepal length (cm)', axis= 1)
-y= iris_df['sepal length (cm)']
 
-# Splitting the Dataset 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size= 0.33, random_state= 101)
+iris = load_iris() #['sepal length (cm)','sepal width (cm)','petal length (cm)','petal width (cm)'],
 
-# Instantiating LinearRegression() Model
-lr = LinearRegression()
 
-# Training/Fitting the Model
-lr.fit(X_train, y_train)
+x = iris.data         # iris['data']
+y = iris.target       # iris['target']
 
-# Making Predictions
-lr.predict(X_test)
-pred = lr.predict(X_test)
 
-# Evaluating Model's Performance
-print('Mean Absolute Error:', mean_absolute_error(y_test, pred))
-print('Mean Squared Error:', mean_squared_error(y_test, pred))
-print('Mean Root Squared Error:', np.sqrt(mean_squared_error(y_test, pred)))
-iris_df.loc[6]
-d = {'sepal length (cm)' : [4.6],
-    'sepal width (cm)' : [3.4],
-    'petal length (cm)' : [1.4],
-    'petal width (cm)' : [0.3],
-    'species' : 0}
-test_df = pd.DataFrame(data= d)
-test_df
-pred = lr.predict(X_test)
-print('Predicted Sepal Length (cm):', pred[0])
-print('Actual Sepal Length (cm):', 4.6)
+
+print(iris['target_names'])
+
+x_train,x_test,y_train,y_test=train_test_split(x,y,test_size=0.3,random_state=0)
+
+Lin = LinearRegression()
+
+Lin.fit(x_train,y_train)
+
+
+print(Lin.coef_) # Here we find b1 of equation b0+b1*x
+
+print(Lin.intercept_) # intercept (b0)
+
+Pred_y = Lin.predict(x_test)
+
+acc = r2_score(y_test,Pred_y)
+print(acc)
+
+#MAE measures the average magnitude of the errors in a set of predictions,without considering their direction.
+#The Mean Absolute Error(MAE) is the average of all absolute errors.
+print(mean_absolute_error(y_test,Pred_y))
+
+
+#RMSE is a quadratic scoring rule that also measures the average magnitude of the error.
+# The average squared difference between the estimated values and the actual value
+print(mean_squared_error(y_test,Pred_y))
